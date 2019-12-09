@@ -15,12 +15,14 @@ const urlDatabase = {
 function generateRandomString() {
 
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
-  let random = "";
-
-  for (let i = 0; i < alphabet.length; i++) {
-    random += alphabet.charAt(Math.random(6) * alphabet.length);
+  var anysize = 6;//the size of string 
+  var charset = "abcdefghijklmnopqrstuvwxyz"; //from where to create
+  let i = 0;
+  let ret='';
+  while(i++ < anysize) {
+    ret += charset.charAt(Math.random() * charset.length)
   }
-  return random;
+  return ret;
 }
 
 
@@ -29,7 +31,9 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  let shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL;
+  console.log(urlDatabase);  // Log the POST request body to the console
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
