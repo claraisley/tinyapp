@@ -14,7 +14,6 @@ const urlDatabase = {
 
 function generateRandomString() {
 
-  const alphabet = "abcdefghijklmnopqrstuvwxyz";
   var anysize = 6;//the size of string 
   var charset = "abcdefghijklmnopqrstuvwxyz"; //from where to create
   let i = 0;
@@ -24,6 +23,16 @@ function generateRandomString() {
   }
   return ret;
 };
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+
+  const value = req.params.shortURL;
+
+  delete urlDatabase[value];
+  res.redirect(`/urls/`); 
+})
+
+
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
