@@ -19,8 +19,8 @@ const urlDatabase = {
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    email: "isleyc97@gmail.com", 
+    password: "dancer12"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -53,9 +53,22 @@ function findUserEmail(obj, emailToSearch) {
 
 app.post("/login", (req, res) => {
 
-  const value = req.body.email;
-  res.cookie("user_id", value);
-  res.redirect("/urls/");
+  let userEmail = req.body.email;
+  let userPassword = req.body.password;
+  let userObject = (findUserEmail(users, userEmail))
+
+ if (userObject) {
+  if (userPassword === userObject.password) {
+  res.cookie("user_id", userObject.id); 
+  res.redirect("/urls");
+  } else {
+  res.status(403).send("Password is not correct");
+ }
+
+} else {
+   res.status(403).send("Email does not exist");
+}
+
 });
 
 
