@@ -8,14 +8,13 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <% if (username) { %>
+        <% if (user) { %>
             <div class = "navbar-item">
-          <h5><%= username %></h5>
+          <h5><%= user.email %></h5>
         </div>
       </div>
       <form class="form-inline" action="/logout" method="POST">
         <div class="form-group mb-2">
-          <label for="UserName"></label>
           <button type="submit" class="btn btn-primary">Logout</button>
         </div>
       </form> 
