@@ -12,9 +12,10 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
+
 
 const users = { 
   "userRandomID": {
@@ -125,8 +126,9 @@ app.get("/login", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
+  let id = req.cookies["user_id"]
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: id }
   res.redirect(`/urls/${shortURL}`);      
 });
 
@@ -138,10 +140,10 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars)
 })
 
-
+//This is a hyperlink to the long url homepage
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -158,7 +160,8 @@ app.get ("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let id = req.cookies["user_id"]
   let user = users[id];
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user };
+  let shortURL = req.params.shortURL;
+  let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
   res.render("urls_show", templateVars);
 });
 
