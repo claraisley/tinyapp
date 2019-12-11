@@ -96,6 +96,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+app.get("/login", (req, res) => {
+  let id = req.cookies["user_id"]
+  let user = users[id];
+  let templateVars = { user };
+  res.render("urls_login", templateVars)
+})
 
 
 app.post("/urls", (req, res) => {
