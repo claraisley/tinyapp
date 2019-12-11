@@ -103,10 +103,17 @@ app.post("/register", (req, res) => {
 
 
 app.get("/urls/new", (req, res) => {
+
   let id = req.cookies["user_id"]
+  if (id) {
   let user = users[id];
   let templateVars = { user };
-  res.render("urls_new", templateVars);
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
+
+
 });
 
 app.get("/login", (req, res) => {
