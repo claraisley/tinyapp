@@ -20,6 +20,7 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
+const { findUserEmail } = require("./helpers")
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
@@ -52,22 +53,6 @@ function generateRandomString() {
   return ret;
 };
 
-const findUserEmail = function(email, database) {
-  for (let user in database) {
-    if (database[user].email === email) {
-      return database[user];
-    }
-  }
-  return null;
-};
-// function findUserEmail(obj, emailToSearch) {
-//   for (let userId in obj) {
-//       if (obj[userId].email === emailToSearch) {
-//         return obj[userId];
-//     }
-//   }
-//   return null;
-// };
 
 function urlsForUser(id) {
   let userObj = {};
