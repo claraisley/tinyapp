@@ -66,7 +66,6 @@ function urlsForUser(id) {
 
 
 app.get("/urls/new", (req, res) => {
-console.log("here")
   let id = req.cookies["user_id"]
   if (id) {
   let user = users[id];
@@ -203,10 +202,10 @@ app.post("/login", (req, res) => {
 
   let userEmail = req.body.email;
   let userPassword = req.body.password;
-  let userObject = (findUserEmail(users, userEmail))
+  let userObject = (findUserEmail(users, userEmail));
 
  if (userObject) {
-  if (userPassword === userObject.password) {
+  if (bcrypt.compareSync(userPassword, userObject.password)) {
   res.cookie("user_id", userObject.id); 
   res.redirect("/urls");
   } else {
