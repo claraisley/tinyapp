@@ -11,6 +11,9 @@ app.use(cookieParser());
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+const bcrypt = require('bcrypt');
+
+
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
@@ -227,13 +230,15 @@ app.post("/register", (req, res) => {
   let userEmail = req.body.email;
   let userPassword = req.body.password;
 
+  const hashedPassword = bcrypt.hashSync(userPassword, 10);
+
   if (findUserEmail(users, userEmail)) {
     res.status(400).send("Email already exists");
   }
   if (userEmail.length === 0 || userPassword.length === 0) {
     res.status(400).send("Email or password is not defined");
   }  
-  users[userId] = {id: userId, email: userEmail, password: userPassword};
+  users[userId] = {id: userId, email: userEmail, password: hashedPassword};
   res.cookie("user_id", userId);
   res.redirect("/urls");
 })
