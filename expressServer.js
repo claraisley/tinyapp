@@ -52,14 +52,22 @@ function generateRandomString() {
   return ret;
 };
 
-function findUserEmail(obj, emailToSearch) {
-  for (let userId in obj) {
-      if (obj[userId].email === emailToSearch) {
-        return obj[userId];
+const findUserEmail = function(email, database) {
+  for (let user in database) {
+    if (database[user].email === email) {
+      return database[user];
     }
   }
   return null;
 };
+// function findUserEmail(obj, emailToSearch) {
+//   for (let userId in obj) {
+//       if (obj[userId].email === emailToSearch) {
+//         return obj[userId];
+//     }
+//   }
+//   return null;
+// };
 
 function urlsForUser(id) {
   let userObj = {};
@@ -209,7 +217,7 @@ app.post("/login", (req, res) => {
 
   let userEmail = req.body.email;
   let userPassword = req.body.password;
-  let userObject = (findUserEmail(users, userEmail));
+  let userObject = (findUserEmail(userEmail, users));
 
  if (userObject) {
   if (bcrypt.compareSync(userPassword, userObject.password)) {
@@ -238,7 +246,7 @@ app.post("/register", (req, res) => {
 
   const hashedPassword = bcrypt.hashSync(userPassword, 10);
 
-  if (findUserEmail(users, userEmail)) {
+  if (findUserEmail(userEmail, users)) {
     res.status(400).send("Email already exists");
   }
   if (userEmail.length === 0 || userPassword.length === 0) {
