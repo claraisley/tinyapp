@@ -7,13 +7,13 @@ const findUserEmail = function(email, database) {
   return undefined;
 };
 
-function generateRandomString() {
+const generateRandomString = function() {
 
-  var anysize = 6;//the size of string 
-  var charset = "abcdefghijklmnopqrstuvwxyz"; //from where to create
+  const anysize = 6;//the size of string
+  const charset = "abcdefghijklmnopqrstuvwxyz"; //from where to create
   let i = 0;
-  let ret='';
-  while(i++ < anysize) {
+  let ret = '';
+  while (i++ < anysize) {
     ret += charset.charAt(Math.random() * charset.length);
   }
   return ret;
@@ -21,7 +21,7 @@ function generateRandomString() {
 
 
 
-function urlsForUser(id, urlDatabase) {
+const urlsForUser = function(id, urlDatabase) {
   let userObj = {};
   for (let key in urlDatabase) {
     if (urlDatabase[key].userID === id) {
