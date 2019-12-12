@@ -5,13 +5,20 @@ const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
-var cookieParser = require('cookie-parser');
-app.use(cookieParser());
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 const bcrypt = require('bcrypt');
+
+var cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  secret: 'Clara',
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 
 const urlDatabase = {
@@ -66,7 +73,7 @@ function urlsForUser(id) {
 
 
 app.get("/urls/new", (req, res) => {
-  let id = req.cookies["user_id"]
+  let id = req.session.user_id;
   if (id) {
   let user = users[id];
   let templateVars = { user };
@@ -78,7 +85,7 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  let id = req.cookies["user_id"];
+  let id = req.session.user_id;
     let shortURL = req.params.shortURL;
 
   if (id) {
@@ -111,7 +118,7 @@ app.get("/u/:shortURL", (req, res) => {
 // The route to the login page
 
 app.get("/login", (req, res) => {
-  let id = req.cookies["user_id"]
+  let id = req.session.user_id;
   let user = users[id];
   let templateVars = { user };
   res.render("urls_login", templateVars)
@@ -119,7 +126,7 @@ app.get("/login", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-  let id = req.cookies["user_id"]
+  let id = req.session.user_id;
   let user = users[id];
   let templateVars = { user };
   res.render("urls_register", templateVars)
@@ -127,7 +134,7 @@ app.get("/register", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  let id = req.cookies["user_id"];
+  let id = req.session.user_id;
   let urls = urlsForUser(id);
     let user = users[id];
     let templateVars = { urls, user };
@@ -157,7 +164,7 @@ app.get("/hello", (req, res) => {
 
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  let id = req.cookies["user_id"];
+  let id = req.session.user_id;
   const shortURL = req.params.shortURL;
   if (id) {
 
@@ -175,7 +182,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 
 app.post("/urls/:shortURL", (req, res) => {
-  let id = req.cookies["user_id"];
+  let id = req.session.user_id;
   let shortURL = req.params.shortURL;
   let newLong = req.body.longURL;
 
@@ -206,7 +213,7 @@ app.post("/login", (req, res) => {
 
  if (userObject) {
   if (bcrypt.compareSync(userPassword, userObject.password)) {
-  res.cookie("user_id", userObject.id); 
+    req.session.user_id = userObject.id;
   res.redirect("/urls");
   } else {
   res.status(403).send("Password is not correct");
@@ -219,7 +226,7 @@ app.post("/login", (req, res) => {
 
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/urls")
 });
 
@@ -238,12 +245,12 @@ app.post("/register", (req, res) => {
     res.status(400).send("Email or password is not defined");
   }  
   users[userId] = {id: userId, email: userEmail, password: hashedPassword};
-  res.cookie("user_id", userId);
+  req.session.user_id = userId;
   res.redirect("/urls");
 })
 
 app.post("/urls", (req, res) => {
-  let id = req.cookies["user_id"]
+  let id = req.session.user_id;
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
 
