@@ -20,8 +20,8 @@ const urlDatabase = {
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
-    email: "isleyc97@gmail.com", 
-    password: "dancer12"
+    email: "example@gmail.com", 
+    password: "dancesfdssdf2"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -49,7 +49,151 @@ function findUserEmail(obj, emailToSearch) {
     }
   }
   return null;
+};
+
+function urlsForUser(id) {
+  let userObj = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      userObj[key] = urlDatabase[key];
+    }
+  }
+  return userObj;
+};
+
+
+app.get("/urls/new", (req, res) => {
+console.log("here")
+  let id = req.cookies["user_id"]
+  if (id) {
+  let user = users[id];
+  let templateVars = { user };
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
+});
+
+
+app.get("/urls/:shortURL", (req, res) => {
+  let id = req.cookies["user_id"];
+    let shortURL = req.params.shortURL;
+
+  if (id) {
+    let userObj = urlsForUser(id);
+    for (let key in userObj) {
+      if (shortURL === key) {  
+        let user = users[id];
+        let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
+        res.render("urls_show", templateVars);
+      }
+    } 
+  } else {
+    res.redirect("/login");
+  }
+});
+
+//This is a hyperlink to the long url homepage
+
+app.get("/u/:shortURL", (req, res) => {
+  let shortURL =  req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
+ 
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    res.send("This URL does not exist!")
+  }
+});
+
+// The route to the login page
+
+app.get("/login", (req, res) => {
+  let id = req.cookies["user_id"]
+  let user = users[id];
+  let templateVars = { user };
+  res.render("urls_login", templateVars)
+});
+
+
+app.get("/register", (req, res) => {
+  let id = req.cookies["user_id"]
+  let user = users[id];
+  let templateVars = { user };
+  res.render("urls_register", templateVars)
+});
+
+
+app.get("/urls", (req, res) => {
+  let id = req.cookies["user_id"];
+  let urls = urlsForUser(id);
+    let user = users[id];
+    let templateVars = { urls, user };
+    res.render("urls_index", templateVars);
+});
+
+
+app.get("/", (req, res) => {
+  res.send("Hello!");
+});
+
+
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+
+app.get("/hello", (req, res) => {
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
+
+
+
+
+
+
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  let id = req.cookies["user_id"];
+  const shortURL = req.params.shortURL;
+  if (id) {
+
+    let userObj = urlsForUser(id);
+    for (let key in userObj) {
+      if (shortURL === key) {  
+       delete urlDatabase[shortURL];
+        res.render("urls_show", templateVars);
+      }
+    }
+  } else {
+    res.redirect("/login")
+  }
+});
+
+
+app.post("/urls/:shortURL", (req, res) => {
+  let id = req.cookies["user_id"];
+  let shortURL = req.params.shortURL;
+  let newLong = req.body.longURL;
+
+if (id) {
+
+  let userObj = urlsForUser(id);
+  for (let key in userObj) {
+    if (shortURL === key) {  
+      let user = users[id];
+      urlDatabase[shortURL].longURL = newLong;
+      let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
+      res.render("urls_show", templateVars);
+      return;
+    }
+  } 
+  res.redirect("/login");
+} else {
+  res.redirect("/login");
 }
+});
 
 
 app.post("/login", (req, res) => {
@@ -64,12 +208,11 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
   } else {
   res.status(403).send("Password is not correct");
- }
+  }
 
-} else {
+  } else {
    res.status(403).send("Email does not exist");
-}
-
+  }
 });
 
 
@@ -78,12 +221,6 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls")
 });
 
-
-app.post("/urls/:shortURL/delete", (req, res) => {
-  const value = req.params.shortURL;
-  delete urlDatabase[value];
-  res.redirect(`/urls/`); 
-});
 
 app.post("/register", (req, res) => {
   let userId = generateRandomString();
@@ -101,95 +238,17 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 })
 
-
-
-app.get("/urls/new", (req, res) => {
-
-  let id = req.cookies["user_id"]
-  if (id) {
-  let user = users[id];
-  let templateVars = { user };
-    res.render("urls_new", templateVars);
-  } else {
-    res.redirect("/login");
-  }
-
-
-});
-
-app.get("/login", (req, res) => {
-  let id = req.cookies["user_id"]
-  let user = users[id];
-  let templateVars = { user };
-  res.render("urls_login", templateVars)
-})
-
-
 app.post("/urls", (req, res) => {
   let id = req.cookies["user_id"]
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: id }
-  res.redirect(`/urls/${shortURL}`);      
-});
+  let longURL = req.body.longURL;
 
-
-app.get("/register", (req, res) => {
-  let id = req.cookies["user_id"]
-  let user = users[id];
-  let templateVars = { user };
-  res.render("urls_register", templateVars)
-})
-
-//This is a hyperlink to the long url homepage
-
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  urlDatabase[shortURL] = { longURL, userID: id }
+  res.redirect(`/urls/${shortURL}`); 
 });
 
 
 
-app.get ("/urls", (req, res) => {
-  let id = req.cookies["user_id"]
-  let user = users[id];
-  let templateVars = { urls: urlDatabase, user };
-  res.render("urls_index", templateVars);
-});
-
-
-app.get("/urls/:shortURL", (req, res) => {
-  let id = req.cookies["user_id"]
-  let user = users[id];
-  let shortURL = req.params.shortURL;
-  let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
-  res.render("urls_show", templateVars);
-});
-
-
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-
-
-app.post("/urls/:shortURL", (req, res) => {
-  const value = req.params.shortURL;
-  urlDatabase[value] = req.body.longURL;
-  res.redirect("/urls")
-});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
