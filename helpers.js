@@ -4,15 +4,32 @@ const findUserEmail = function(email, database) {
       return database[user];
     }
   }
-  return null;
+  return undefined;
 };
-// function findUserEmail(obj, emailToSearch) {
-//   for (let userId in obj) {
-//       if (obj[userId].email === emailToSearch) {
-//         return obj[userId];
-//     }
-//   }
-//   return null;
-// };
 
-module.exports = { findUserEmail };
+function generateRandomString() {
+
+  var anysize = 6;//the size of string 
+  var charset = "abcdefghijklmnopqrstuvwxyz"; //from where to create
+  let i = 0;
+  let ret='';
+  while(i++ < anysize) {
+    ret += charset.charAt(Math.random() * charset.length);
+  }
+  return ret;
+};
+
+
+
+function urlsForUser(id, urlDatabase) {
+  let userObj = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      userObj[key] = urlDatabase[key];
+    }
+  }
+  return userObj;
+};
+
+
+module.exports = { findUserEmail, generateRandomString, urlsForUser };

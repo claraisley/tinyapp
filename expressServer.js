@@ -20,12 +20,14 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
-const { findUserEmail } = require("./helpers")
+
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
+
+const { findUserEmail, generateRandomString, urlsForUser } = require("./helpers");
 
 
 const users = { 
@@ -41,28 +43,28 @@ const users = {
   }
 };
 
-function generateRandomString() {
+// function generateRandomString() {
 
-  var anysize = 6;//the size of string 
-  var charset = "abcdefghijklmnopqrstuvwxyz"; //from where to create
-  let i = 0;
-  let ret='';
-  while(i++ < anysize) {
-    ret += charset.charAt(Math.random() * charset.length);
-  }
-  return ret;
-};
+//   var anysize = 6;//the size of string 
+//   var charset = "abcdefghijklmnopqrstuvwxyz"; //from where to create
+//   let i = 0;
+//   let ret='';
+//   while(i++ < anysize) {
+//     ret += charset.charAt(Math.random() * charset.length);
+//   }
+//   return ret;
+// };
 
 
-function urlsForUser(id) {
-  let userObj = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userID === id) {
-      userObj[key] = urlDatabase[key];
-    }
-  }
-  return userObj;
-};
+// function urlsForUser(id) {
+//   let userObj = {};
+//   for (let key in urlDatabase) {
+//     if (urlDatabase[key].userID === id) {
+//       userObj[key] = urlDatabase[key];
+//     }
+//   }
+//   return userObj;
+// };
 
 
 app.get("/urls/new", (req, res) => {
@@ -82,7 +84,7 @@ app.get("/urls/:shortURL", (req, res) => {
     let shortURL = req.params.shortURL;
 
   if (id) {
-    let userObj = urlsForUser(id);
+    let userObj = urlsForUser(id, urlDatabase);
     for (let key in userObj) {
       if (shortURL === key) {  
         let user = users[id];
@@ -128,7 +130,7 @@ app.get("/register", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let id = req.session.user_id;
-  let urls = urlsForUser(id);
+  let urls = urlsForUser(id, urlDatabase);
     let user = users[id];
     let templateVars = { urls, user };
     res.render("urls_index", templateVars);
@@ -161,7 +163,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   if (id) {
 
-    let userObj = urlsForUser(id);
+    let userObj = urlsForUser(id, urlDatabase);
     for (let key in userObj) {
       if (shortURL === key) {  
        delete urlDatabase[shortURL];
@@ -181,7 +183,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 if (id) {
 
-  let userObj = urlsForUser(id);
+  let userObj = urlsForUser(id, urlDatabase);
   for (let key in userObj) {
     if (shortURL === key) {  
       let user = users[id];
